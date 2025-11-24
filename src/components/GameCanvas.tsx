@@ -27,7 +27,7 @@ export const GameCanvas = ({ game, setGame }: GameCanvasProps) => {
     return () => {
       newGame.cleanup();
     };
-  }, [setGame]);
+  }, []); // Empty dependency array - only initialize once
 
   return (
     <div className="relative">
