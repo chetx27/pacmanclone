@@ -2,6 +2,7 @@ import { useState } from "react";
 import { GameCanvas } from "@/components/GameCanvas";
 import { GameControls } from "@/components/GameControls";
 import { GameOver } from "@/components/GameOver";
+import { InstructionsDialog } from "@/components/InstructionsDialog";
 import { Game } from "@/lib/game";
 
 const Index = () => {
@@ -10,6 +11,7 @@ const Index = () => {
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
   const [isGameOver, setIsGameOver] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(true);
 
   const handleGameInit = (gameInstance: Game) => {
     gameInstance.setCallbacks(
@@ -24,6 +26,7 @@ const Index = () => {
   };
 
   const handleStart = () => {
+    setShowInstructions(false);
     if (game) {
       game.start();
       setIsPlaying(true);
@@ -50,9 +53,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-8">
+      <InstructionsDialog open={showInstructions} onStart={handleStart} />
+      
       <div className="flex flex-col lg:flex-row gap-8 items-center lg:items-start">
         <div className="flex flex-col items-center gap-4">
-          <h1 className="text-5xl md:text-6xl font-bold text-primary tracking-wider font-mono text-center">
+          <h1 className="text-5xl md:text-6xl font-bold text-primary tracking-wider font-mono text-center animate-pulse">
             PAC-MAN
           </h1>
           <div className="relative">
