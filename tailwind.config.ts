@@ -57,6 +57,16 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        game: {
+          pacman: "hsl(var(--pacman))",
+          "ghost-red": "hsl(var(--ghost-red))",
+          "ghost-pink": "hsl(var(--ghost-pink))",
+          "ghost-cyan": "hsl(var(--ghost-cyan))",
+          "ghost-orange": "hsl(var(--ghost-orange))",
+          wall: "hsl(var(--wall))",
+          pellet: "hsl(var(--pellet))",
+          "power-pellet": "hsl(var(--power-pellet))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
