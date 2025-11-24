@@ -47,9 +47,16 @@ interface Ghost {
   color: string;
   speed: number;
   scared: boolean;
-  mode: "house" | "exiting" | "chase" | "scatter";
-  scatterTarget: { x: number; y: number };
 }
+
+const GHOST_STARTS: Position[] = [
+  { x: 11.5, y: 5 },
+  { x: 13.5, y: 5 },
+  { x: 15.5, y: 5 },
+  { x: 17.5, y: 5 },
+];
+
+const GHOST_COLORS = ["#FF0000", "#FFB8FF", "#00FFFF", "#FFB852"] as const;
 
 export class Game {
   private ctx: CanvasRenderingContext2D;
@@ -76,12 +83,7 @@ export class Game {
     this.width = width;
     this.height = height;
     this.pacman = { x: 13.5, y: 23, direction: "RIGHT", nextDirection: "RIGHT", speed: 0.1 };
-    this.ghosts = [
-      { x: 13.5, y: 11, color: "#FF0000", speed: 0.075, scared: false, mode: "chase", scatterTarget: { x: 25, y: 0 } },
-      { x: 11.5, y: 14, color: "#FFB8FF", speed: 0.075, scared: false, mode: "house", scatterTarget: { x: 2, y: 0 } },
-      { x: 13.5, y: 14, color: "#00FFFF", speed: 0.075, scared: false, mode: "house", scatterTarget: { x: 27, y: 31 } },
-      { x: 15.5, y: 14, color: "#FFB852", speed: 0.075, scared: false, mode: "house", scatterTarget: { x: 0, y: 31 } },
-    ];
+    this.ghosts = this.createGhosts();
     this.pellets = [];
     this.powerPellets = [];
     this.score = 0;
@@ -96,6 +98,16 @@ export class Game {
     this.initPellets();
     this.setupControls();
     this.draw();
+  }
+
+  private createGhosts(): Ghost[] {
+    return GHOST_STARTS.map((start, index) => ({
+      x: start.x,
+      y: start.y,
+      color: GHOST_COLORS[index],
+      speed: 0.075,
+      scared: false,
+    }));
   }
 
   private initPellets() {
@@ -207,172 +219,156 @@ export class Game {
     if (this.scaredTimer > 0) {
       this.scaredTimer--;
       if (this.scaredTimer === 0) {
-        this.ghosts.forEach(g => g.scared = false);
+        this.ghosts.forEach((g) => {
+          g.scared = false;
+        });
       }
     }
 
-    this.ghosts.forEach((ghost, index) => {
+    for (let i = 0; i < this.ghosts.length; i++) {
+      const ghost = this.ghosts[i];
       const movement = ghost.speed * deltaTime * 60;
-      
-      let targetX = ghost.x;
-      let targetY = ghost.y;
-      
-      // Handle ghost house exit
-      if (ghost.mode === "house") {
-        // Move to center of ghost house first
-        if (Math.abs(ghost.x - 13.5) > 0.1) {
-          targetX = ghost.x + (ghost.x < 13.5 ? movement : -movement);
-        } else {
-          ghost.mode = "exiting";
-        }
-      } else if (ghost.mode === "exiting") {
-        // Exit upward to row 11
-        if (ghost.y > 11.5) {
-          targetY = ghost.y - movement;
-        } else {
-          ghost.mode = "chase";
-        }
-      } else if (ghost.scared) {
-        // Run away from pacman
-        const dx = this.pacman.x - ghost.x;
-        const dy = this.pacman.y - ghost.y;
-        
+
+      let newX = ghost.x;
+      let newY = ghost.y;
+
+      const dx = this.pacman.x - ghost.x;
+      const dy = this.pacman.y - ghost.y;
+
+      if (ghost.scared) {
         if (Math.abs(dx) > Math.abs(dy)) {
-          targetX += dx > 0 ? -movement : movement;
+          newX += dx > 0 ? -movement : movement;
         } else {
-          targetY += dy > 0 ? -movement : movement;
+          newY += dy > 0 ? -movement : movement;
         }
       } else {
-        // Chase or scatter behavior
-        const dx = this.pacman.x - ghost.x;
-        const dy = this.pacman.y - ghost.y;
-        
-        switch(index) {
-          case 0: // Red - direct chase
+        switch (i) {
+          case 0: {
             if (Math.abs(dx) > Math.abs(dy)) {
-              targetX += dx > 0 ? movement : -movement;
+              newX += dx > 0 ? movement : -movement;
             } else {
-              targetY += dy > 0 ? movement : -movement;
+              newY += dy > 0 ? movement : -movement;
             }
             break;
-          case 1: // Pink - try to get in front
-            const predictX = this.pacman.x + (this.pacman.direction === "LEFT" ? -2 : this.pacman.direction === "RIGHT" ? 2 : 0);
-            const predictY = this.pacman.y + (this.pacman.direction === "UP" ? -2 : this.pacman.direction === "DOWN" ? 2 : 0);
+          }
+          case 1: {
+            const predictX =
+              this.pacman.x +
+              (this.pacman.direction === "LEFT"
+                ? -2
+                : this.pacman.direction === "RIGHT"
+                  ? 2
+                  : 0);
+            const predictY =
+              this.pacman.y +
+              (this.pacman.direction === "UP"
+                ? -2
+                : this.pacman.direction === "DOWN"
+                  ? 2
+                  : 0);
             const pdx = predictX - ghost.x;
             const pdy = predictY - ghost.y;
             if (Math.abs(pdx) > Math.abs(pdy)) {
-              targetX += pdx > 0 ? movement : -movement;
+              newX += pdx > 0 ? movement : -movement;
             } else {
-              targetY += pdy > 0 ? movement : -movement;
+              newY += pdy > 0 ? movement : -movement;
             }
             break;
-          case 2: // Cyan - patrol if far, chase if close
+          }
+          case 2: {
             const distance = Math.sqrt(dx * dx + dy * dy);
             if (distance < 8) {
               if (Math.abs(dx) > Math.abs(dy)) {
-                targetX += dx > 0 ? movement : -movement;
+                newX += dx > 0 ? movement : -movement;
               } else {
-                targetY += dy > 0 ? movement : -movement;
+                newY += dy > 0 ? movement : -movement;
               }
             } else {
-              const pdx2 = 5 - ghost.x;
-              const pdy2 = 25 - ghost.y;
-              if (Math.abs(pdx2) > Math.abs(pdy2)) {
-                targetX += pdx2 > 0 ? movement : -movement;
+              const patrolDx = 5 - ghost.x;
+              const patrolDy = 25 - ghost.y;
+              if (Math.abs(patrolDx) > Math.abs(patrolDy)) {
+                newX += patrolDx > 0 ? movement : -movement;
               } else {
-                targetY += pdy2 > 0 ? movement : -movement;
+                newY += patrolDy > 0 ? movement : -movement;
               }
             }
             break;
-          case 3: // Orange - random with occasional chase
+          }
+          case 3: {
             if (Math.random() < 0.3) {
               if (Math.abs(dx) > Math.abs(dy)) {
-                targetX += dx > 0 ? movement : -movement;
+                newX += dx > 0 ? movement : -movement;
               } else {
-                targetY += dy > 0 ? movement : -movement;
+                newY += dy > 0 ? movement : -movement;
               }
             } else {
               const directions = [
                 { x: movement, y: 0 },
                 { x: -movement, y: 0 },
                 { x: 0, y: movement },
-                { x: 0, y: -movement }
+                { x: 0, y: -movement },
               ];
               const randomDir = directions[Math.floor(Math.random() * directions.length)];
-              targetX += randomDir.x;
-              targetY += randomDir.y;
+              newX += randomDir.x;
+              newY += randomDir.y;
             }
-            break;
-        }
-      }
-      
-      // Try to move to target position
-      if (this.canMove(targetX, targetY)) {
-        ghost.x = targetX;
-        ghost.y = targetY;
-      } else if (ghost.mode !== "house" && ghost.mode !== "exiting") {
-        // Try alternative directions if blocked (not in house)
-        const altDirections = [
-          { x: movement, y: 0 },
-          { x: -movement, y: 0 },
-          { x: 0, y: movement },
-          { x: 0, y: -movement }
-        ];
-        
-        for (const dir of altDirections) {
-          const altX = ghost.x + dir.x;
-          const altY = ghost.y + dir.y;
-          if (this.canMove(altX, altY)) {
-            ghost.x = altX;
-            ghost.y = altY;
             break;
           }
         }
       }
 
-      // Check collision with pacman
-      const distance = Math.sqrt(
-        Math.pow(ghost.x - this.pacman.x, 2) + Math.pow(ghost.y - this.pacman.y, 2)
+      if (this.canMove(newX, newY)) {
+        ghost.x = newX;
+        ghost.y = newY;
+      } else {
+        const alternatives = [
+          { x: ghost.x + movement, y: ghost.y },
+          { x: ghost.x - movement, y: ghost.y },
+          { x: ghost.x, y: ghost.y + movement },
+          { x: ghost.x, y: ghost.y - movement },
+        ];
+        for (const alt of alternatives) {
+          if (this.canMove(alt.x, alt.y)) {
+            ghost.x = alt.x;
+            ghost.y = alt.y;
+            break;
+          }
+        }
+      }
+
+      if (ghost.x < 0) ghost.x = COLS - 1;
+      if (ghost.x >= COLS) ghost.x = 0;
+
+      const distanceToPacman = Math.sqrt(
+        Math.pow(ghost.x - this.pacman.x, 2) + Math.pow(ghost.y - this.pacman.y, 2),
       );
-      
-      if (distance < 0.5) {
+
+      if (distanceToPacman < 0.5) {
         if (ghost.scared) {
-          // Eat ghost - send back to house
-          ghost.x = 13.5;
-          ghost.y = 14;
+          const spawn = GHOST_STARTS[i];
+          ghost.x = spawn.x;
+          ghost.y = spawn.y;
           ghost.scared = false;
-          ghost.mode = "exiting";
           this.score += 200;
           if (this.onScoreChange) this.onScoreChange(this.score);
         } else {
-          // Lose life
           this.lives--;
           if (this.onLivesChange) this.onLivesChange(this.lives);
-          
+
           if (this.lives <= 0) {
             this.stop();
             if (this.onGameOver) this.onGameOver();
           } else {
-            // Reset positions
             this.pacman.x = 13.5;
             this.pacman.y = 23;
             this.pacman.direction = "RIGHT";
-            this.ghosts[0].x = 13.5;
-            this.ghosts[0].y = 11;
-            this.ghosts[0].mode = "chase";
-            this.ghosts[1].x = 11.5;
-            this.ghosts[1].y = 14;
-            this.ghosts[1].mode = "house";
-            this.ghosts[2].x = 13.5;
-            this.ghosts[2].y = 14;
-            this.ghosts[2].mode = "house";
-            this.ghosts[3].x = 15.5;
-            this.ghosts[3].y = 14;
-            this.ghosts[3].mode = "house";
+            this.ghosts = this.createGhosts();
           }
+
+          break;
         }
       }
-    });
+    }
   }
 
   private update(currentTime: number) {
@@ -577,12 +573,7 @@ export class Game {
   public restart() {
     this.stop();
     this.pacman = { x: 13.5, y: 23, direction: "RIGHT", nextDirection: "RIGHT", speed: 0.1 };
-    this.ghosts = [
-      { x: 13.5, y: 11, color: "#FF0000", speed: 0.075, scared: false, mode: "chase", scatterTarget: { x: 25, y: 0 } },
-      { x: 11.5, y: 14, color: "#FFB8FF", speed: 0.075, scared: false, mode: "house", scatterTarget: { x: 2, y: 0 } },
-      { x: 13.5, y: 14, color: "#00FFFF", speed: 0.075, scared: false, mode: "house", scatterTarget: { x: 27, y: 31 } },
-      { x: 15.5, y: 14, color: "#FFB852", speed: 0.075, scared: false, mode: "house", scatterTarget: { x: 0, y: 31 } },
-    ];
+    this.ghosts = this.createGhosts();
     this.score = 0;
     this.lives = 3;
     this.scaredTimer = 0;
