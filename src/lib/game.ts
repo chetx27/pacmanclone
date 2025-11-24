@@ -209,46 +209,105 @@ export class Game {
       }
     }
 
-    this.ghosts.forEach((ghost) => {
+    this.ghosts.forEach((ghost, index) => {
       const movement = ghost.speed * deltaTime * 60;
       
-      // Simple AI: move towards pacman with some randomness
+      // Simple AI with individual behavior per ghost
       const dx = this.pacman.x - ghost.x;
       const dy = this.pacman.y - ghost.y;
       
-      let newX = ghost.x;
-      let newY = ghost.y;
+      let targetX = ghost.x;
+      let targetY = ghost.y;
       
       if (ghost.scared) {
         // Run away from pacman
         if (Math.abs(dx) > Math.abs(dy)) {
-          newX += dx > 0 ? -movement : movement;
+          targetX += dx > 0 ? -movement : movement;
         } else {
-          newY += dy > 0 ? -movement : movement;
+          targetY += dy > 0 ? -movement : movement;
         }
       } else {
-        // Chase pacman
-        if (Math.abs(dx) > Math.abs(dy)) {
-          newX += dx > 0 ? movement : -movement;
-        } else {
-          newY += dy > 0 ? movement : -movement;
+        // Each ghost has slightly different behavior
+        switch(index) {
+          case 0: // Red - direct chase
+            if (Math.abs(dx) > Math.abs(dy)) {
+              targetX += dx > 0 ? movement : -movement;
+            } else {
+              targetY += dy > 0 ? movement : -movement;
+            }
+            break;
+          case 1: // Pink - try to get in front
+            const predictX = this.pacman.x + (this.pacman.direction === "LEFT" ? -2 : this.pacman.direction === "RIGHT" ? 2 : 0);
+            const predictY = this.pacman.y + (this.pacman.direction === "UP" ? -2 : this.pacman.direction === "DOWN" ? 2 : 0);
+            const pdx = predictX - ghost.x;
+            const pdy = predictY - ghost.y;
+            if (Math.abs(pdx) > Math.abs(pdy)) {
+              targetX += pdx > 0 ? movement : -movement;
+            } else {
+              targetY += pdy > 0 ? movement : -movement;
+            }
+            break;
+          case 2: // Cyan - patrol if far, chase if close
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance < 8) {
+              if (Math.abs(dx) > Math.abs(dy)) {
+                targetX += dx > 0 ? movement : -movement;
+              } else {
+                targetY += dy > 0 ? movement : -movement;
+              }
+            } else {
+              // Patrol bottom left
+              const pdx2 = 5 - ghost.x;
+              const pdy2 = 25 - ghost.y;
+              if (Math.abs(pdx2) > Math.abs(pdy2)) {
+                targetX += pdx2 > 0 ? movement : -movement;
+              } else {
+                targetY += pdy2 > 0 ? movement : -movement;
+              }
+            }
+            break;
+          case 3: // Orange - random with occasional chase
+            if (Math.random() < 0.3) {
+              if (Math.abs(dx) > Math.abs(dy)) {
+                targetX += dx > 0 ? movement : -movement;
+              } else {
+                targetY += dy > 0 ? movement : -movement;
+              }
+            } else {
+              const directions = [
+                { x: movement, y: 0 },
+                { x: -movement, y: 0 },
+                { x: 0, y: movement },
+                { x: 0, y: -movement }
+              ];
+              const randomDir = directions[Math.floor(Math.random() * directions.length)];
+              targetX += randomDir.x;
+              targetY += randomDir.y;
+            }
+            break;
         }
       }
       
-      if (this.canMove(newX, newY)) {
-        ghost.x = newX;
-        ghost.y = newY;
+      // Try to move to target position
+      if (this.canMove(targetX, targetY)) {
+        ghost.x = targetX;
+        ghost.y = targetY;
       } else {
-        // Try alternative direction
-        if (Math.abs(dx) > Math.abs(dy)) {
-          newY += dy > 0 ? movement : -movement;
-          if (this.canMove(ghost.x, newY)) {
-            ghost.y = newY;
-          }
-        } else {
-          newX += dx > 0 ? movement : -movement;
-          if (this.canMove(newX, ghost.y)) {
-            ghost.x = newX;
+        // Try alternative directions if blocked
+        const altDirections = [
+          { x: movement, y: 0 },
+          { x: -movement, y: 0 },
+          { x: 0, y: movement },
+          { x: 0, y: -movement }
+        ];
+        
+        for (const dir of altDirections) {
+          const altX = ghost.x + dir.x;
+          const altY = ghost.y + dir.y;
+          if (this.canMove(altX, altY)) {
+            ghost.x = altX;
+            ghost.y = altY;
+            break;
           }
         }
       }
