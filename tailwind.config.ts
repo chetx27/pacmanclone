@@ -13,6 +13,9 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        arcade: ['"Press Start 2P"', 'cursive', 'monospace'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -67,6 +70,12 @@ export default {
           pellet: "hsl(var(--pellet))",
           "power-pellet": "hsl(var(--power-pellet))",
         },
+        neon: {
+          yellow: "hsl(var(--neon-yellow))",
+          cyan: "hsl(var(--neon-cyan))",
+          pink: "hsl(var(--neon-pink))",
+          green: "hsl(var(--neon-green))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -90,10 +99,27 @@ export default {
             height: "0",
           },
         },
+        "pulse-neon": {
+          "0%, 100%": {
+            textShadow: "0 0 10px currentColor, 0 0 20px currentColor, 0 0 40px currentColor",
+          },
+          "50%": {
+            textShadow: "0 0 20px currentColor, 0 0 40px currentColor, 0 0 80px currentColor",
+          },
+        },
+        "flicker": {
+          "0%, 100%": { opacity: "1" },
+          "41.99%": { opacity: "1" },
+          "42%": { opacity: "0" },
+          "43%": { opacity: "0" },
+          "45%": { opacity: "1" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "pulse-neon": "pulse-neon 2s ease-in-out infinite",
+        "flicker": "flicker 3s linear infinite",
       },
     },
   },

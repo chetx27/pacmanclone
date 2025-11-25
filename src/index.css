@@ -8,54 +8,60 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 230 35% 7%;
-    --foreground: 48 100% 88%;
+    --background: 0 0% 0%;
+    --foreground: 48 100% 90%;
 
-    --card: 230 30% 10%;
-    --card-foreground: 48 100% 88%;
+    --card: 240 100% 5%;
+    --card-foreground: 48 100% 90%;
 
-    --popover: 230 30% 10%;
-    --popover-foreground: 48 100% 88%;
+    --popover: 240 100% 5%;
+    --popover-foreground: 48 100% 90%;
 
-    --primary: 48 100% 50%;
-    --primary-foreground: 230 35% 7%;
+    --primary: 48 100% 60%;
+    --primary-foreground: 0 0% 0%;
 
-    --secondary: 210 100% 56%;
-    --secondary-foreground: 230 35% 7%;
+    --secondary: 180 100% 50%;
+    --secondary-foreground: 0 0% 0%;
 
-    --muted: 230 20% 20%;
-    --muted-foreground: 48 20% 70%;
+    --muted: 240 20% 15%;
+    --muted-foreground: 48 50% 70%;
 
-    --accent: 330 100% 71%;
-    --accent-foreground: 230 35% 7%;
+    --accent: 330 100% 60%;
+    --accent-foreground: 0 0% 0%;
 
-    --destructive: 0 100% 50%;
-    --destructive-foreground: 48 100% 88%;
+    --destructive: 0 100% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 210 100% 40%;
-    --input: 210 100% 40%;
-    --ring: 48 100% 50%;
+    --border: 180 100% 50%;
+    --input: 180 100% 50%;
+    --ring: 48 100% 60%;
 
-    --radius: 0.75rem;
+    --radius: 0rem;
 
-    /* Game colors */
-    --pacman: 48 100% 50%;
-    --ghost-red: 0 100% 50%;
-    --ghost-pink: 330 100% 71%;
+    /* Retro game colors */
+    --pacman: 48 100% 60%;
+    --ghost-red: 0 100% 60%;
+    --ghost-pink: 330 100% 65%;
     --ghost-cyan: 180 100% 50%;
-    --ghost-orange: 30 100% 50%;
-    --wall: 210 100% 56%;
+    --ghost-orange: 30 100% 60%;
+    --wall: 210 100% 50%;
     --pellet: 0 0% 100%;
-    --power-pellet: 48 100% 88%;
+    --power-pellet: 48 100% 90%;
+    
+    /* Neon effects */
+    --neon-yellow: 48 100% 60%;
+    --neon-cyan: 180 100% 50%;
+    --neon-pink: 330 100% 60%;
+    --neon-green: 120 100% 50%;
 
-    --sidebar-background: 230 30% 10%;
-    --sidebar-foreground: 48 100% 88%;
-    --sidebar-primary: 48 100% 50%;
-    --sidebar-primary-foreground: 230 35% 7%;
-    --sidebar-accent: 230 20% 20%;
-    --sidebar-accent-foreground: 48 100% 88%;
-    --sidebar-border: 210 100% 40%;
-    --sidebar-ring: 48 100% 50%;
+    --sidebar-background: 240 100% 5%;
+    --sidebar-foreground: 48 100% 90%;
+    --sidebar-primary: 48 100% 60%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 240 20% 15%;
+    --sidebar-accent-foreground: 48 100% 90%;
+    --sidebar-border: 180 100% 50%;
+    --sidebar-ring: 48 100% 60%;
   }
 }
 
@@ -65,6 +71,80 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-arcade;
+    background: 
+      repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+      ),
+      radial-gradient(ellipse at center, hsl(240 100% 5%) 0%, hsl(0 0% 0%) 100%);
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 255, 255, 0.03),
+      rgba(0, 255, 255, 0.03) 2px,
+      transparent 2px,
+      transparent 4px
+    );
+    pointer-events: none;
+    z-index: 1000;
+    animation: scanline 8s linear infinite;
+  }
+
+  @keyframes scanline {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(4px); }
+  }
+}
+
+@layer utilities {
+  .text-neon-yellow {
+    color: hsl(var(--neon-yellow));
+    text-shadow: 
+      0 0 10px hsl(var(--neon-yellow)),
+      0 0 20px hsl(var(--neon-yellow)),
+      0 0 40px hsl(var(--neon-yellow));
+  }
+
+  .text-neon-cyan {
+    color: hsl(var(--neon-cyan));
+    text-shadow: 
+      0 0 10px hsl(var(--neon-cyan)),
+      0 0 20px hsl(var(--neon-cyan)),
+      0 0 40px hsl(var(--neon-cyan));
+  }
+
+  .text-neon-pink {
+    color: hsl(var(--neon-pink));
+    text-shadow: 
+      0 0 10px hsl(var(--neon-pink)),
+      0 0 20px hsl(var(--neon-pink)),
+      0 0 40px hsl(var(--neon-pink));
+  }
+
+  .arcade-border {
+    border: 3px solid hsl(var(--neon-cyan));
+    box-shadow: 
+      0 0 20px hsl(var(--neon-cyan) / 0.5),
+      inset 0 0 20px hsl(var(--neon-cyan) / 0.1);
+  }
+
+  .arcade-glow {
+    box-shadow: 
+      0 0 10px hsl(var(--neon-yellow) / 0.5),
+      0 0 20px hsl(var(--neon-yellow) / 0.3),
+      0 0 40px hsl(var(--neon-yellow) / 0.2);
   }
 }
