@@ -20,21 +20,21 @@ export const GameControls = ({
 }: GameControlsProps) => {
   return (
     <div className="w-full max-w-md space-y-4 md:space-y-6">
-      <div className="flex justify-between items-center bg-card arcade-border p-3 md:p-4 backdrop-blur-sm">
+      <div className="flex justify-between items-center bg-card mc-border p-4 md:p-5">
         <div className="text-center flex-1">
-          <div className="text-muted-foreground text-[0.5rem] md:text-xs mb-1 md:mb-2 uppercase tracking-widest">Score</div>
-          <div className="text-xl md:text-3xl font-bold text-neon-yellow tracking-wider uppercase">
+          <div className="text-muted-foreground text-sm md:text-xl mb-2 uppercase tracking-wider mc-text-shadow">Score</div>
+          <div className="text-2xl md:text-4xl font-bold text-accent tracking-wider uppercase mc-text-shadow">
             {score.toString().padStart(5, "0")}
           </div>
         </div>
-        <div className="h-10 md:h-12 w-px bg-secondary mx-2 md:mx-4" />
+        <div className="h-12 md:h-16 w-1 bg-border mx-3 md:mx-4" />
         <div className="text-center flex-1">
-          <div className="text-muted-foreground text-[0.5rem] md:text-xs mb-1 md:mb-2 uppercase tracking-widest">Lives</div>
+          <div className="text-muted-foreground text-sm md:text-xl mb-2 uppercase tracking-wider mc-text-shadow">Lives</div>
           <div className="flex justify-center gap-1 md:gap-2">
             {Array.from({ length: Math.max(0, lives) }).map((_, i) => (
               <div
                 key={i}
-                className="w-4 h-4 md:w-6 md:h-6 rounded-full bg-primary arcade-glow animate-pulse"
+                className="w-5 h-5 md:w-7 md:h-7 rounded-full bg-accent animate-pixel-pulse pixelated"
               />
             ))}
           </div>
@@ -45,32 +45,32 @@ export const GameControls = ({
         {!isPlaying ? (
           <Button
             onClick={onStart}
-            className="flex-1 h-12 md:h-14 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs md:text-lg arcade-glow hover:scale-105 transition-all uppercase"
+            className="flex-1 h-14 md:h-16 bg-primary hover:bg-primary text-primary-foreground font-bold text-base md:text-2xl mc-button uppercase tracking-wider"
           >
-            <Play className="mr-1 md:mr-2 h-4 w-4 md:h-6 md:w-6" />
+            <Play className="mr-2 h-5 w-5 md:h-7 md:w-7" />
             Start
           </Button>
         ) : (
           <Button
             onClick={onPause}
             variant="outline"
-            className="flex-1 h-12 md:h-14 border-2 md:border-3 border-secondary text-neon-cyan font-bold text-xs md:text-lg hover:bg-secondary/20 uppercase"
+            className="flex-1 h-14 md:h-16 bg-secondary hover:bg-secondary text-secondary-foreground font-bold text-base md:text-2xl mc-button uppercase tracking-wider"
           >
-            <Pause className="mr-1 md:mr-2 h-4 w-4 md:h-6 md:w-6" />
+            <Pause className="mr-2 h-5 w-5 md:h-7 md:w-7" />
             Pause
           </Button>
         )}
         <Button
           onClick={onRestart}
           variant="outline"
-          className="h-12 md:h-14 px-4 md:px-6 border-2 md:border-3 border-accent text-neon-pink font-bold hover:bg-accent/20"
+          className="h-14 md:h-16 px-5 md:px-7 bg-destructive hover:bg-destructive text-destructive-foreground font-bold mc-button"
         >
-          <RotateCcw className="h-4 w-4 md:h-6 md:w-6" />
+          <RotateCcw className="h-5 w-5 md:h-7 md:w-7" />
         </Button>
       </div>
 
-      <div className="text-center text-muted-foreground text-[0.5rem] md:text-xs bg-card/50 p-2 md:p-3 arcade-border uppercase tracking-widest">
-        Use <span className="text-neon-cyan font-bold">Arrow Keys</span> to move
+      <div className="text-center text-foreground text-sm md:text-xl bg-muted p-3 md:p-4 mc-border uppercase tracking-wider mc-text-shadow">
+        Use <span className="text-primary font-bold">Arrow Keys</span>
       </div>
     </div>
   );
