@@ -14,7 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        arcade: ['"Press Start 2P"', 'cursive', 'monospace'],
+        minecraft: ['"VT323"', 'monospace'],
+        arcade: ['"VT323"', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -70,11 +71,11 @@ export default {
           pellet: "hsl(var(--pellet))",
           "power-pellet": "hsl(var(--power-pellet))",
         },
-        neon: {
-          yellow: "hsl(var(--neon-yellow))",
-          cyan: "hsl(var(--neon-cyan))",
-          pink: "hsl(var(--neon-pink))",
-          green: "hsl(var(--neon-green))",
+        mc: {
+          grass: "hsl(var(--mc-grass))",
+          dirt: "hsl(var(--mc-dirt))",
+          stone: "hsl(var(--mc-stone))",
+          wood: "hsl(var(--mc-wood))",
         },
       },
       borderRadius: {
@@ -99,27 +100,30 @@ export default {
             height: "0",
           },
         },
-        "pulse-neon": {
+        "bounce-slow": {
           "0%, 100%": {
-            textShadow: "0 0 10px currentColor, 0 0 20px currentColor, 0 0 40px currentColor",
+            transform: "translateY(0)",
           },
           "50%": {
-            textShadow: "0 0 20px currentColor, 0 0 40px currentColor, 0 0 80px currentColor",
+            transform: "translateY(-10px)",
           },
         },
-        "flicker": {
-          "0%, 100%": { opacity: "1" },
-          "41.99%": { opacity: "1" },
-          "42%": { opacity: "0" },
-          "43%": { opacity: "0" },
-          "45%": { opacity: "1" },
+        "pixel-pulse": {
+          "0%, 100%": { 
+            transform: "scale(1)",
+            filter: "brightness(1)",
+          },
+          "50%": { 
+            transform: "scale(1.05)",
+            filter: "brightness(1.2)",
+          },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "pulse-neon": "pulse-neon 2s ease-in-out infinite",
-        "flicker": "flicker 3s linear infinite",
+        "bounce-slow": "bounce-slow 2s ease-in-out infinite",
+        "pixel-pulse": "pixel-pulse 1.5s ease-in-out infinite",
       },
     },
   },
