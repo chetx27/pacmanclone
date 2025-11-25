@@ -7,10 +7,6 @@ This project is a clone of the classic **Pac-Man** game, implemented using moder
 You can try out the live version of the game here:
 [Pac-Man Clone Demo](https://pacmanclone.lovable.app)
 
-### Preview
-
-![Pac-Man Clone Screenshot](https://pacmanclone.lovable.app/screenshot.png)
-*(Replace this link with an actual screenshot of the game if available)*
 
 ## Features
 
