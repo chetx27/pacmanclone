@@ -47,6 +47,7 @@ interface Ghost {
   color: string;
   speed: number;
   scared: boolean;
+  direction: "UP" | "DOWN" | "LEFT" | "RIGHT";
 }
 
 const GHOST_STARTS: Position[] = [
@@ -101,12 +102,20 @@ export class Game {
   }
 
   private createGhosts(): Ghost[] {
+    const directions: Array<"UP" | "DOWN" | "LEFT" | "RIGHT"> = [
+      "LEFT",
+      "RIGHT",
+      "UP",
+      "DOWN",
+    ];
+
     return GHOST_STARTS.map((start, index) => ({
       x: start.x,
       y: start.y,
       color: GHOST_COLORS[index],
       speed: 0.075,
       scared: false,
+      direction: directions[index % directions.length],
     }));
   }
 
@@ -225,117 +234,139 @@ export class Game {
       }
     }
 
+    const directions: Array<"UP" | "DOWN" | "LEFT" | "RIGHT"> = [
+      "UP",
+      "DOWN",
+      "LEFT",
+      "RIGHT",
+    ];
+    const opposite: Record<"UP" | "DOWN" | "LEFT" | "RIGHT", "UP" | "DOWN" | "LEFT" | "RIGHT"> = {
+      UP: "DOWN",
+      DOWN: "UP",
+      LEFT: "RIGHT",
+      RIGHT: "LEFT",
+    };
+
     for (let i = 0; i < this.ghosts.length; i++) {
       const ghost = this.ghosts[i];
       const movement = ghost.speed * deltaTime * 60;
 
-      let newX = ghost.x;
-      let newY = ghost.y;
+      // Decide target tile for this ghost
+      let targetX = this.pacman.x;
+      let targetY = this.pacman.y;
 
       const dx = this.pacman.x - ghost.x;
       const dy = this.pacman.y - ghost.y;
 
-      if (ghost.scared) {
-        if (Math.abs(dx) > Math.abs(dy)) {
-          newX += dx > 0 ? -movement : movement;
-        } else {
-          newY += dy > 0 ? -movement : movement;
-        }
-      } else {
+      if (!ghost.scared) {
         switch (i) {
           case 0: {
-            if (Math.abs(dx) > Math.abs(dy)) {
-              newX += dx > 0 ? movement : -movement;
-            } else {
-              newY += dy > 0 ? movement : -movement;
-            }
+            // Direct chaser (uses Pac-Man position)
             break;
           }
           case 1: {
+            // Predictive ghost: aims a bit ahead of Pac-Man
             const predictX =
               this.pacman.x +
               (this.pacman.direction === "LEFT"
                 ? -2
                 : this.pacman.direction === "RIGHT"
-                  ? 2
-                  : 0);
+                ? 2
+                : 0);
             const predictY =
               this.pacman.y +
               (this.pacman.direction === "UP"
                 ? -2
                 : this.pacman.direction === "DOWN"
-                  ? 2
-                  : 0);
-            const pdx = predictX - ghost.x;
-            const pdy = predictY - ghost.y;
-            if (Math.abs(pdx) > Math.abs(pdy)) {
-              newX += pdx > 0 ? movement : -movement;
-            } else {
-              newY += pdy > 0 ? movement : -movement;
-            }
+                ? 2
+                : 0);
+            targetX = predictX;
+            targetY = predictY;
             break;
           }
           case 2: {
+            // Patrol ghost: chases when close, otherwise patrols bottom-left
             const distance = Math.sqrt(dx * dx + dy * dy);
-            if (distance < 8) {
-              if (Math.abs(dx) > Math.abs(dy)) {
-                newX += dx > 0 ? movement : -movement;
-              } else {
-                newY += dy > 0 ? movement : -movement;
-              }
-            } else {
-              const patrolDx = 5 - ghost.x;
-              const patrolDy = 25 - ghost.y;
-              if (Math.abs(patrolDx) > Math.abs(patrolDy)) {
-                newX += patrolDx > 0 ? movement : -movement;
-              } else {
-                newY += patrolDy > 0 ? movement : -movement;
-              }
+            if (distance >= 8) {
+              targetX = 5;
+              targetY = 25;
             }
             break;
           }
           case 3: {
-            if (Math.random() < 0.3) {
-              if (Math.abs(dx) > Math.abs(dy)) {
-                newX += dx > 0 ? movement : -movement;
-              } else {
-                newY += dy > 0 ? movement : -movement;
-              }
-            } else {
-              const directions = [
-                { x: movement, y: 0 },
-                { x: -movement, y: 0 },
-                { x: 0, y: movement },
-                { x: 0, y: -movement },
-              ];
-              const randomDir = directions[Math.floor(Math.random() * directions.length)];
-              newX += randomDir.x;
-              newY += randomDir.y;
+            // Random / chaser mix
+            if (Math.random() > 0.3) {
+              // Slightly random target around Pac-Man
+              targetX = this.pacman.x + (Math.random() - 0.5) * 4;
+              targetY = this.pacman.y + (Math.random() - 0.5) * 4;
             }
             break;
           }
         }
       }
 
-      if (this.canMove(newX, newY)) {
-        ghost.x = newX;
-        ghost.y = newY;
-      } else {
-        const alternatives = [
-          { x: ghost.x + movement, y: ghost.y },
-          { x: ghost.x - movement, y: ghost.y },
-          { x: ghost.x, y: ghost.y + movement },
-          { x: ghost.x, y: ghost.y - movement },
-        ];
-        for (const alt of alternatives) {
-          if (this.canMove(alt.x, alt.y)) {
-            ghost.x = alt.x;
-            ghost.y = alt.y;
-            break;
-          }
-        }
+      const dirVectors: Record<"UP" | "DOWN" | "LEFT" | "RIGHT", { x: number; y: number }> = {
+        UP: { x: 0, y: -movement },
+        DOWN: { x: 0, y: movement },
+        LEFT: { x: -movement, y: 0 },
+        RIGHT: { x: movement, y: 0 },
+      };
+
+      // Build candidate moves
+      type CandidateDir = {
+        dir: "UP" | "DOWN" | "LEFT" | "RIGHT";
+        nx: number;
+        ny: number;
+        distance: number;
+      };
+
+      let candidates: CandidateDir[] = directions
+        .map((dir) => {
+          const vec = dirVectors[dir];
+          const nx = ghost.x + vec.x;
+          const ny = ghost.y + vec.y;
+          const distance = Math.hypot(targetX - nx, targetY - ny);
+          return { dir, nx, ny, distance };
+        })
+        .filter((c) => this.canMove(c.nx, c.ny));
+
+      if (candidates.length === 0) {
+        // No valid moves, skip this frame
+        continue;
       }
 
+      // Scared ghosts try to move away from Pac-Man (maximize distance)
+      if (ghost.scared) {
+        candidates.sort((a, b) => b.distance - a.distance);
+      } else {
+        // Normal ghosts move toward their target (minimize distance)
+        candidates.sort((a, b) => a.distance - b.distance);
+      }
+
+      // Prefer to keep the same direction when possible and not reverse
+      let chosen = candidates.find(
+        (c) =>
+          c.dir === ghost.direction &&
+          c.dir !== opposite[ghost.direction],
+      );
+
+      if (!chosen) {
+        // Pick the best candidate that is not directly reversing, if possible
+        chosen = candidates.find(
+          (c) => c.dir !== opposite[ghost.direction],
+        );
+      }
+
+      if (!chosen) {
+        // If all options would reverse, just take the best one
+        chosen = candidates[0];
+      }
+
+      ghost.direction = chosen.dir;
+      ghost.x = chosen.nx;
+      ghost.y = chosen.ny;
+
+      // Wrap around horizontally
       if (ghost.x < 0) ghost.x = COLS - 1;
       if (ghost.x >= COLS) ghost.x = 0;
 
@@ -349,6 +380,8 @@ export class Game {
           ghost.x = spawn.x;
           ghost.y = spawn.y;
           ghost.scared = false;
+          // Reset direction when sent back to spawn
+          ghost.direction = "UP";
           this.score += 200;
           if (this.onScoreChange) this.onScoreChange(this.score);
         } else {
@@ -362,6 +395,7 @@ export class Game {
             this.pacman.x = 13.5;
             this.pacman.y = 23;
             this.pacman.direction = "RIGHT";
+            this.pacman.nextDirection = "RIGHT";
             this.ghosts = this.createGhosts();
           }
 
