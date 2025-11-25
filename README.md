@@ -1,73 +1,87 @@
-# Welcome to your Lovable project
+# Pac-Man Clone
 
-## Project info
+This project is a clone of the classic **Pac-Man** game, implemented using modern web technologies. The game can be played directly in your web browser and is fully responsive for a seamless experience on both desktop and mobile devices.
 
-**URL**: https://lovable.dev/projects/9164d739-d044-45c1-ba30-b6461fcae0be
+## Demo
 
-## How can I edit this code?
+You can try out the live version of the game here:
+[Pac-Man Clone Demo](https://pacmanclone.lovable.app)
 
-There are several ways of editing your application.
+### Preview
 
-**Use Lovable**
+![Pac-Man Clone Screenshot](https://pacmanclone.lovable.app/screenshot.png)
+*(Replace this link with an actual screenshot of the game if available)*
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/9164d739-d044-45c1-ba30-b6461fcae0be) and start prompting.
+## Features
 
-Changes made via Lovable will be committed automatically to this repo.
+* Classic Pac-Man gameplay with maze navigation, eating pellets, and avoiding ghosts.
+* Responsive design for mobile and desktop browsers.
+* Score tracking and game over screen.
+* Simple and intuitive controls (arrow keys or WASD).
 
-**Use your preferred IDE**
+## Technologies Used
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+* **HTML5** – For structuring the game.
+* **CSS3** – For styling and layout.
+* **JavaScript (ES6+)** – For game logic and interactivity.
+* **Canvas API** – For rendering the game environment.
+* **Local Storage** – For saving high scores.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Installation
 
-Follow these steps:
+To run the game locally, follow these steps:
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+1. Clone the repository:
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+   ```bash
+   git clone https://github.com/yourusername/pacman-clone.git
+   ```
 
-# Step 3: Install the necessary dependencies.
-npm i
+2. Navigate into the project folder:
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+   ```bash
+   cd pacman-clone
+   ```
 
-**Edit a file directly in GitHub**
+3. Open the `index.html` file in your browser:
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+   ```bash
+   open index.html
+   ```
 
-**Use GitHub Codespaces**
+4. Play and enjoy the game!
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## How to Play
 
-## What technologies are used for this project?
+1. Use **arrow keys** (Up, Down, Left, Right) or **WASD** to move Pac-Man around the maze.
+2. Eat all the pellets to clear the level and advance.
+3. Avoid the ghosts. If they catch you, the game will end.
+4. Collect power pellets to temporarily turn the tables and eat the ghosts!
+5. Your score is displayed at the top, and the highest score is saved in local storage.
 
-This project is built with:
+## Contributing
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+If you'd like to contribute to this project, feel free to fork the repository, make changes, and submit a pull request. Contributions are always welcome!
 
-## How can I deploy this project?
+### How to Contribute
 
-Simply open [Lovable](https://lovable.dev/projects/9164d739-d044-45c1-ba30-b6461fcae0be) and click on Share -> Publish.
+1. Fork the repository.
+2. Create a feature branch:
 
-## Can I connect a custom domain to my Lovable project?
+   ```bash
+   git checkout -b feature-name
+   ```
+3. Make your changes and commit them:
 
-Yes, you can!
+   ```bash
+   git commit -m "Add feature-name"
+   ```
+4. Push to your forked repository:
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+   ```bash
+   git push origin feature-name
+   ```
+5. Open a pull request from your feature branch to the `main` branch of the original repository.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+
+Let me know if you'd like to adjust any part of this or add something else!
