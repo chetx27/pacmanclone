@@ -52,15 +52,17 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-8">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 md:p-8 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-neon-cyan/5 to-transparent pointer-events-none" />
+      
       <InstructionsDialog open={showInstructions} onStart={handleStart} />
       
-      <div className="flex flex-col lg:flex-row gap-8 items-center lg:items-start">
-        <div className="flex flex-col items-center gap-4">
-          <h1 className="text-5xl md:text-6xl font-bold text-primary tracking-wider font-mono text-center animate-pulse">
+      <div className="flex flex-col lg:flex-row gap-6 md:gap-8 items-center lg:items-start relative z-10">
+        <div className="flex flex-col items-center gap-4 md:gap-6">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-neon-yellow tracking-wider text-center animate-pulse-neon uppercase">
             PAC-MAN
           </h1>
-          <div className="relative">
+          <div className="relative arcade-border p-2 bg-black/50 backdrop-blur-sm">
             <GameCanvas game={game} setGame={handleGameInit} />
             {isGameOver && <GameOver score={score} onRestart={handleRestart} />}
           </div>

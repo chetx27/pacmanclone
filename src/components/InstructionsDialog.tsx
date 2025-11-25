@@ -9,50 +9,50 @@ interface InstructionsDialogProps {
 export const InstructionsDialog = ({ open, onStart }: InstructionsDialogProps) => {
   return (
     <Dialog open={open}>
-      <DialogContent className="max-w-md bg-card border-4 border-primary shadow-[0_0_40px_rgba(255,215,0,0.4)]">
-        <DialogTitle className="text-5xl font-bold text-center text-primary tracking-wider font-mono mb-4">
+      <DialogContent className="max-w-md bg-card arcade-border backdrop-blur-sm">
+        <DialogTitle className="text-3xl md:text-4xl font-bold text-center text-neon-yellow tracking-wider mb-4 uppercase animate-pulse-neon">
           PAC-MAN
         </DialogTitle>
         
-        <div className="space-y-4 text-foreground">
-          <div className="bg-background/50 p-4 rounded-lg border-2 border-secondary text-center">
-            <p className="text-lg text-muted-foreground leading-relaxed font-mono">
-              EAT PELLETS • AVOID GHOSTS
+        <div className="space-y-3 md:space-y-4 text-foreground">
+          <div className="bg-background/50 p-3 md:p-4 arcade-border text-center">
+            <p className="text-xs md:text-sm text-muted-foreground leading-relaxed uppercase tracking-widest">
+              Eat Pellets • Avoid Ghosts
             </p>
-            <p className="text-sm text-muted-foreground mt-2 font-mono">
-              USE ARROW KEYS TO MOVE
+            <p className="text-[0.6rem] md:text-xs text-neon-cyan mt-2 uppercase tracking-widest">
+              Use Arrow Keys
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 text-center text-sm">
-            <div className="bg-background/50 p-3 rounded border border-border">
-              <div className="w-3 h-3 rounded-full bg-pellet mx-auto mb-1" />
-              <span className="text-primary font-bold font-mono">10 PTS</span>
+          <div className="grid grid-cols-2 gap-2 md:gap-3 text-center text-xs">
+            <div className="bg-background/50 p-2 md:p-3 arcade-border">
+              <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-pellet mx-auto mb-1 arcade-glow" />
+              <span className="text-neon-yellow font-bold uppercase text-[0.6rem] md:text-xs">10 Pts</span>
             </div>
-            <div className="bg-background/50 p-3 rounded border border-border">
-              <div className="w-4 h-4 rounded-full bg-power-pellet mx-auto mb-1 shadow-[0_0_8px_rgba(255,215,0,0.6)]" />
-              <span className="text-primary font-bold font-mono">50 PTS</span>
+            <div className="bg-background/50 p-2 md:p-3 arcade-border">
+              <div className="w-3 h-3 md:w-4 md:h-4 rounded-full bg-power-pellet mx-auto mb-1 arcade-glow animate-pulse" />
+              <span className="text-neon-yellow font-bold uppercase text-[0.6rem] md:text-xs">50 Pts</span>
             </div>
           </div>
 
-          <div className="bg-background/50 p-3 rounded-lg border-2 border-accent text-center">
-            <p className="text-sm text-muted-foreground font-mono">
-              POWER PELLETS MAKE GHOSTS BLUE
+          <div className="bg-background/50 p-2 md:p-3 arcade-border text-center">
+            <p className="text-[0.6rem] md:text-xs text-muted-foreground uppercase tracking-widest">
+              Power = Blue Ghosts
             </p>
-            <p className="text-accent font-bold text-lg font-mono">EAT THEM = 200 PTS</p>
+            <p className="text-neon-pink font-bold text-sm md:text-base uppercase">Eat = 200 Pts</p>
           </div>
         </div>
 
         <Button
           onClick={onStart}
           size="lg"
-          className="w-full h-14 mt-4 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xl shadow-[0_0_30px_rgba(255,215,0,0.5)] hover:shadow-[0_0_40px_rgba(255,215,0,0.7)] transition-all font-mono"
+          className="w-full h-12 md:h-14 mt-3 md:mt-4 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm md:text-xl arcade-glow hover:scale-105 transition-all uppercase"
         >
-          START GAME
+          Start Game
         </Button>
 
-        <p className="text-center text-xs text-muted-foreground mt-3 font-mono animate-pulse">
-          PRESS START TO PLAY
+        <p className="text-center text-[0.5rem] md:text-xs text-muted-foreground mt-2 md:mt-3 animate-pulse uppercase tracking-widest">
+          Press Start
         </p>
       </DialogContent>
     </Dialog>
