@@ -167,12 +167,25 @@ export class Game {
   }
 
   private canMove(x: number, y: number): boolean {
-    const col = Math.floor(x);
-    const row = Math.floor(y);
+    // Check multiple points around the character (corners and center)
+    const radius = 0.4; // Slightly less than 0.5 to account for character size
+    const points = [
+      { x: x, y: y }, // center
+      { x: x - radius, y: y - radius }, // top-left
+      { x: x + radius, y: y - radius }, // top-right
+      { x: x - radius, y: y + radius }, // bottom-left
+      { x: x + radius, y: y + radius }, // bottom-right
+    ];
     
-    if (row < 0 || row >= ROWS || col < 0 || col >= COLS) return false;
+    for (const point of points) {
+      const col = Math.floor(point.x);
+      const row = Math.floor(point.y);
+      
+      if (row < 0 || row >= ROWS || col < 0 || col >= COLS) return false;
+      if (MAZE[row][col] === 1) return false;
+    }
     
-    return MAZE[row][col] !== 1;
+    return true;
   }
 
   private updatePacman(deltaTime: number) {
