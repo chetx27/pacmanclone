@@ -109,11 +109,15 @@ export class Game {
       "DOWN",
     ];
 
+    // Base speed increases with score (difficulty scaling)
+    const baseSpeed = 0.075 + (this.score / 10000) * 0.025;
+
     return GHOST_STARTS.map((start, index) => ({
       x: start.x,
       y: start.y,
       color: GHOST_COLORS[index],
-      speed: 0.075,
+      // Each ghost has slightly different speed
+      speed: baseSpeed + (index * 0.005),
       scared: false,
       direction: directions[index % directions.length],
     }));
@@ -238,6 +242,9 @@ export class Game {
       }
     }
 
+    // Dynamic difficulty: ghosts get faster as score increases
+    const difficultyMultiplier = 1 + (this.score / 5000) * 0.3;
+
     const directions: Array<"UP" | "DOWN" | "LEFT" | "RIGHT"> = [
       "UP",
       "DOWN",
@@ -253,7 +260,7 @@ export class Game {
 
     for (let i = 0; i < this.ghosts.length; i++) {
       const ghost = this.ghosts[i];
-      const movement = ghost.speed * deltaTime * 60;
+      const movement = ghost.speed * deltaTime * 60 * difficultyMultiplier;
 
       // Decide target tile for this ghost
       let targetX = this.pacman.x;
@@ -261,48 +268,83 @@ export class Game {
 
       const dx = this.pacman.x - ghost.x;
       const dy = this.pacman.y - ghost.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
 
       if (!ghost.scared) {
+        // Difficulty increases aggression
+        const aggressionThreshold = Math.max(3, 8 - (this.score / 1000));
+
         switch (i) {
           case 0: {
-            // Direct chaser (uses Pac-Man position)
+            // RED - Direct aggressive chaser (Shadow/Blinky)
+            // Gets more aggressive at higher scores
+            if (this.score > 1000) {
+              // At high scores, try to cut off escape routes
+              const futureX = this.pacman.x + (this.pacman.direction === "LEFT" ? -1 : this.pacman.direction === "RIGHT" ? 1 : 0);
+              const futureY = this.pacman.y + (this.pacman.direction === "UP" ? -1 : this.pacman.direction === "DOWN" ? 1 : 0);
+              targetX = futureX;
+              targetY = futureY;
+            }
             break;
           }
           case 1: {
-            // Predictive ghost: aims a bit ahead of Pac-Man
+            // PINK - Ambusher (aims ahead of Pac-Man)
+            const predictDistance = 2 + Math.floor(this.score / 2000);
             const predictX =
               this.pacman.x +
               (this.pacman.direction === "LEFT"
-                ? -2
+                ? -predictDistance
                 : this.pacman.direction === "RIGHT"
-                ? 2
+                ? predictDistance
                 : 0);
             const predictY =
               this.pacman.y +
               (this.pacman.direction === "UP"
-                ? -2
+                ? -predictDistance
                 : this.pacman.direction === "DOWN"
-                ? 2
+                ? predictDistance
                 : 0);
             targetX = predictX;
             targetY = predictY;
             break;
           }
           case 2: {
-            // Patrol ghost: chases when close, otherwise patrols bottom-left
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            if (distance >= 8) {
-              targetX = 5;
-              targetY = 25;
+            // CYAN - Patrol/Flanker (Inky-like behavior)
+            // Switches between patrol and aggressive chase
+            if (distance >= aggressionThreshold) {
+              // Patrol corners when far
+              const cornerTargets = [
+                { x: 5, y: 5 },
+                { x: 22, y: 5 },
+                { x: 5, y: 25 },
+                { x: 22, y: 25 }
+              ];
+              const target = cornerTargets[Math.floor((Date.now() / 5000) % cornerTargets.length)];
+              targetX = target.x;
+              targetY = target.y;
+            } else {
+              // When close, use flanking strategy
+              const redGhost = this.ghosts[0];
+              const vectorX = this.pacman.x - redGhost.x;
+              const vectorY = this.pacman.y - redGhost.y;
+              targetX = this.pacman.x + vectorX;
+              targetY = this.pacman.y + vectorY;
             }
             break;
           }
           case 3: {
-            // Random / chaser mix
-            if (Math.random() > 0.3) {
-              // Slightly random target around Pac-Man
-              targetX = this.pacman.x + (Math.random() - 0.5) * 4;
-              targetY = this.pacman.y + (Math.random() - 0.5) * 4;
+            // ORANGE - Smart random (Clyde-like)
+            // Close: random/scatter, Far: chase
+            if (distance < aggressionThreshold) {
+              // Scatter to corner when too close
+              targetX = 1;
+              targetY = ROWS - 2;
+            } else {
+              // Chase when far, but with some randomness
+              if (Math.random() > 0.2) {
+                targetX = this.pacman.x + (Math.random() - 0.5) * 3;
+                targetY = this.pacman.y + (Math.random() - 0.5) * 3;
+              }
             }
             break;
           }
