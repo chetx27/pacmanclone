@@ -74,6 +74,7 @@ const Index = () => {
           onRestart={handleRestart}
           score={score}
           lives={lives}
+          game={game}
         />
       </div>
     </div>

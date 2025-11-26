@@ -158,6 +158,10 @@ export class Game {
     this.onGameOver = onGameOver;
   }
 
+  public setDirection(direction: "UP" | "DOWN" | "LEFT" | "RIGHT") {
+    this.pacman.nextDirection = direction;
+  }
+
   private canMove(x: number, y: number): boolean {
     const col = Math.floor(x);
     const row = Math.floor(y);

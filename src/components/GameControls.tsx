@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Play, Pause, RotateCcw } from "lucide-react";
+import { Play, Pause, RotateCcw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from "lucide-react";
+import { Game } from "@/lib/game";
 
 interface GameControlsProps {
   isPlaying: boolean;
@@ -8,6 +9,7 @@ interface GameControlsProps {
   onRestart: () => void;
   score: number;
   lives: number;
+  game: Game | null;
 }
 
 export const GameControls = ({
@@ -17,7 +19,13 @@ export const GameControls = ({
   onRestart,
   score,
   lives,
+  game,
 }: GameControlsProps) => {
+  const handleDirection = (direction: "UP" | "DOWN" | "LEFT" | "RIGHT") => {
+    if (game && isPlaying) {
+      game.setDirection(direction);
+    }
+  };
   return (
     <div className="w-full max-w-md space-y-4 md:space-y-6">
       <div className="flex justify-between items-center bg-card arcade-border p-3 md:p-4 backdrop-blur-sm">
@@ -70,7 +78,45 @@ export const GameControls = ({
       </div>
 
       <div className="text-center text-muted-foreground text-[0.5rem] md:text-xs bg-card/50 p-2 md:p-3 arcade-border uppercase tracking-widest">
-        Use <span className="text-neon-cyan font-bold">Arrow Keys</span> to move
+        Use <span className="text-neon-cyan font-bold">Arrow Keys</span> or buttons below
+      </div>
+
+      {/* Touch Controls for Mobile */}
+      <div className="flex flex-col items-center gap-2">
+        <Button
+          onClick={() => handleDirection("UP")}
+          variant="outline"
+          className="h-12 w-12 border-2 border-neon-cyan text-neon-cyan hover:bg-neon-cyan/20 arcade-glow"
+          disabled={!isPlaying}
+        >
+          <ArrowUp className="h-6 w-6" />
+        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => handleDirection("LEFT")}
+            variant="outline"
+            className="h-12 w-12 border-2 border-neon-cyan text-neon-cyan hover:bg-neon-cyan/20 arcade-glow"
+            disabled={!isPlaying}
+          >
+            <ArrowLeft className="h-6 w-6" />
+          </Button>
+          <Button
+            onClick={() => handleDirection("DOWN")}
+            variant="outline"
+            className="h-12 w-12 border-2 border-neon-cyan text-neon-cyan hover:bg-neon-cyan/20 arcade-glow"
+            disabled={!isPlaying}
+          >
+            <ArrowDown className="h-6 w-6" />
+          </Button>
+          <Button
+            onClick={() => handleDirection("RIGHT")}
+            variant="outline"
+            className="h-12 w-12 border-2 border-neon-cyan text-neon-cyan hover:bg-neon-cyan/20 arcade-glow"
+            disabled={!isPlaying}
+          >
+            <ArrowRight className="h-6 w-6" />
+          </Button>
+        </div>
       </div>
     </div>
   );
